@@ -9,7 +9,6 @@ gsap.registerPlugin(ScrollTrigger);
 // ─── Project Image Slider Modal ──────────────────────────────────────────────
 function ProjectSlider({ project, onClose }) {
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const imgRef = useRef(null);
   const touchStartX = useRef(null);
@@ -21,7 +20,6 @@ function ProjectSlider({ project, onClose }) {
   const goTo = useCallback((idx, dir) => {
     if (isAnimating) return;
     setIsAnimating(true);
-    setDirection(dir);
     const el = imgRef.current;
     if (el) {
       gsap.to(el, {
@@ -147,6 +145,7 @@ function ProjectSlider({ project, onClose }) {
 
         {/* Info bar */}
         <div className="slider-info-bar">
+          {/* Top row: meta tags | project name | dots */}
           <div className="slider-info-left">
             <span className="slider-type-tag">{project.type}</span>
             <span className="slider-location">{project.location}</span>
@@ -168,6 +167,11 @@ function ProjectSlider({ project, onClose }) {
                 />
               ))}
             </div>
+          )}
+
+          {/* Description — bottom-left */}
+          {project.description && (
+            <p className="slider-description">{project.description}</p>
           )}
         </div>
       </div>

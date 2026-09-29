@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { ArrowRight, X, MapPin, Phone, Mail } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, Mail } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Custom Instagram icon (lucide-react older versions may not include it)
+gsap.registerPlugin(ScrollTrigger);
+
+// Custom Instagram icon
 const InstagramIcon = ({ size = 14, style }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={style}>
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -9,12 +13,7 @@ const InstagramIcon = ({ size = 14, style }) => (
     <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
   </svg>
 );
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
-
-// Task 4.1: Dropdown options
 const START_OPTIONS = [
   { value: '', label: 'Select one' },
   { value: 'immediate', label: 'i. Immediate' },
@@ -34,6 +33,61 @@ const PROJECT_TYPES = [
 
 const FORM_ENDPOINT = 'https://formspree.io/f/enquiry.studioeshanya';
 
+// ── Sanitize text — strip HTML/script injection
+function sanitizeText(val) {
+  return val
+    .replace(/<[^>]*>/g, '')     // strip HTML tags
+    .replace(/[<>"'&]/g, '')     // strip dangerous chars
+    .trimStart();
+}
+
+// ── Sanitize phone — digits only, max 10
+function sanitizePhone(val) {
+  return val.replace(/\D/g, '').slice(0, 10);
+}
+
+// ── Full form validation
+function validateForm(data) {
+  const errors = {};
+  const name = data.name.trim();
+  const phone = data.phone.trim();
+  const email = data.email.trim();
+
+  if (!name) {
+    errors.name = 'Name is required.';
+  } else if (name.length < 2) {
+    errors.name = 'Name must be at least 2 characters.';
+  } else if (name.length > 80) {
+    errors.name = 'Name is too long (max 80 characters).';
+  }
+
+  if (!phone) {
+    errors.phone = 'Phone number is required.';
+  } else if (!/^\d{10}$/.test(phone)) {
+    errors.phone = 'Enter a valid 10-digit phone number.';
+  }
+
+  if (!email) {
+    errors.email = 'Email is required.';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Enter a valid email address.';
+  }
+
+  if (!data.projectType) {
+    errors.projectType = 'Please select a project type.';
+  }
+
+  if (!data.startTimeline) {
+    errors.startTimeline = 'Please select a timeline.';
+  }
+
+  if (data.message && data.message.length > 1000) {
+    errors.message = 'Message must be under 1000 characters.';
+  }
+
+  return errors;
+}
+
 export default function Contact() {
   const sectionRef = useRef(null);
   const [formData, setFormData] = useState({
@@ -41,6 +95,7 @@ export default function Contact() {
     projectType: '', projectLocation: '',
     startTimeline: '', message: '',
   });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -58,24 +113,75 @@ export default function Contact() {
     return () => ctx.revert();
   }, []);
 
+  // Handle regular text fields with sanitization
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    const sanitized = sanitizeText(value);
+    setFormData(prev => ({ ...prev, [name]: sanitized }));
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Handle phone — digits only, max 10
+  const handlePhoneChange = (e) => {
+    const digits = sanitizePhone(e.target.value);
+    setFormData(prev => ({ ...prev, phone: digits }));
+    if (fieldErrors.phone) {
+      setFieldErrors(prev => ({ ...prev, phone: '' }));
+    }
+  };
+
+  // Block non-numeric keys in phone field
+  const handlePhoneKeyDown = (e) => {
+    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'Home', 'End'];
+    if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  // Block non-numeric paste in phone field
+  const handlePhonePaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text');
+    const digits = sanitizePhone(text);
+    setFormData(prev => ({ ...prev, phone: digits }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setError('');
+
+    const errors = validateForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      // Focus first error field
+      const firstKey = Object.keys(errors)[0];
+      const idMap = { name: 'contact-name', phone: 'contact-phone', email: 'contact-email', projectType: 'contact-project-type', startTimeline: 'contact-start-timeline', message: 'contact-message' };
+      const el = document.getElementById(idMap[firstKey]);
+      if (el) el.focus();
+      return;
+    }
+
+    setSubmitting(true);
     try {
-      // Send to Formspree (or Netlify Forms)
       const res = await fetch(FORM_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          phone: formData.phone,
+          email: formData.email.trim(),
+          projectType: formData.projectType,
+          projectLocation: formData.projectLocation.trim(),
+          startTimeline: formData.startTimeline,
+          message: formData.message.trim(),
+        }),
       });
       if (res.ok) {
         setSubmitted(true);
         setFormData({ name: '', phone: '', email: '', projectType: '', projectLocation: '', startTimeline: '', message: '' });
+        setFieldErrors({});
       } else {
         setError('Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
       }
@@ -84,6 +190,14 @@ export default function Contact() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const errStyle = {
+    fontSize: '0.68rem',
+    color: '#c0392b',
+    marginTop: '0.3rem',
+    fontFamily: 'Inter, sans-serif',
+    letterSpacing: '0.02em',
   };
 
   return (
@@ -149,11 +263,25 @@ export default function Contact() {
               </a>
             </div>
 
-            {/* Direct Line */}
+            {/* Direct Line — Task 7: monospace font for phone number */}
             <div className="contact-reveal" style={{ marginBottom: '1.2rem' }}>
               <p className="eyebrow" style={{ marginBottom: '0.3rem' }}>Direct Line</p>
-              <a href="tel:+919110605559" style={{ pointerEvents: 'auto', fontFamily: 'Playfair Display, serif', fontSize: '1rem', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Phone size={14} style={{ color: 'var(--terracotta)' }} />
+              <a
+                href="tel:+919110605559"
+                style={{
+                  pointerEvents: 'auto',
+                  fontFamily: '"DM Mono", "Roboto Mono", "Courier New", monospace',
+                  fontSize: '1.2rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.06em',
+                  color: 'var(--charcoal)',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <Phone size={14} style={{ color: 'var(--terracotta)', flexShrink: 0 }} />
                 +91 91106 05559
               </a>
             </div>
@@ -203,7 +331,7 @@ export default function Contact() {
             />
           </div>
 
-          {/* RIGHT — Contact Form */}
+          {/* RIGHT — Enquiry Form */}
           <div className="contact-reveal">
             {submitted ? (
               <div style={{ padding: '3rem 0', textAlign: 'center' }}>
@@ -221,7 +349,7 @@ export default function Contact() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                   {/* Name */}
                   <div>
@@ -230,24 +358,46 @@ export default function Contact() {
                       id="contact-name"
                       name="name"
                       type="text"
-                      required
+                      autoComplete="name"
                       value={formData.name}
                       onChange={handleChange}
                       className="form-input"
+                      style={fieldErrors.name ? { borderBottomColor: '#c0392b' } : {}}
+                      maxLength={80}
                     />
+                    {fieldErrors.name && <p style={errStyle}>{fieldErrors.name}</p>}
                   </div>
-                  {/* Phone */}
+
+                  {/* Phone — Task 8: digits only, exactly 10 */}
                   <div>
-                    <label className="form-label" htmlFor="contact-phone">Phone *</label>
+                    <label className="form-label" htmlFor="contact-phone">
+                      Phone * &nbsp;<span style={{ opacity: 0.55, fontWeight: 400, fontSize: '0.6rem' }}>(10-digit number)</span>
+                    </label>
                     <input
                       id="contact-phone"
                       name="phone"
                       type="tel"
-                      required
+                      inputMode="numeric"
+                      pattern="\d{10}"
+                      autoComplete="tel"
                       value={formData.phone}
-                      onChange={handleChange}
+                      onChange={handlePhoneChange}
+                      onKeyDown={handlePhoneKeyDown}
+                      onPaste={handlePhonePaste}
                       className="form-input"
+                      style={fieldErrors.phone ? { borderBottomColor: '#c0392b' } : {}}
+                      placeholder="e.g. 9876543210"
+                      maxLength={10}
                     />
+                    {fieldErrors.phone && <p style={errStyle}>{fieldErrors.phone}</p>}
+                    {!fieldErrors.phone && formData.phone.length > 0 && formData.phone.length < 10 && (
+                      <p style={{ ...errStyle, color: 'var(--terracotta)' }}>
+                        {10 - formData.phone.length} more digit{10 - formData.phone.length !== 1 ? 's' : ''} needed
+                      </p>
+                    )}
+                    {!fieldErrors.phone && formData.phone.length === 10 && (
+                      <p style={{ ...errStyle, color: '#27ae60' }}>✓ Valid number</p>
+                    )}
                   </div>
                 </div>
 
@@ -259,27 +409,31 @@ export default function Contact() {
                       id="contact-email"
                       name="email"
                       type="email"
-                      required
+                      autoComplete="email"
                       value={formData.email}
                       onChange={handleChange}
                       className="form-input"
+                      style={fieldErrors.email ? { borderBottomColor: '#c0392b' } : {}}
                     />
+                    {fieldErrors.email && <p style={errStyle}>{fieldErrors.email}</p>}
                   </div>
+
                   {/* Project Type */}
                   <div>
                     <label className="form-label" htmlFor="contact-project-type">Project Type *</label>
                     <select
                       id="contact-project-type"
                       name="projectType"
-                      required
                       value={formData.projectType}
                       onChange={handleChange}
                       className="form-input"
+                      style={fieldErrors.projectType ? { borderBottomColor: '#c0392b' } : {}}
                     >
                       {PROJECT_TYPES.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
+                    {fieldErrors.projectType && <p style={errStyle}>{fieldErrors.projectType}</p>}
                   </div>
                 </div>
 
@@ -294,31 +448,40 @@ export default function Contact() {
                     value={formData.projectLocation}
                     onChange={handleChange}
                     className="form-input"
+                    maxLength={100}
                   />
                 </div>
 
-                {/* Task 4.1: New "When do you want to start?" dropdown */}
+                {/* Timeline */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label className="form-label" htmlFor="contact-timeline">
+                  <label className="form-label" htmlFor="contact-start-timeline">
                     When do you want to start with us? *
                   </label>
                   <select
-                    id="contact-timeline"
+                    id="contact-start-timeline"
                     name="startTimeline"
-                    required
                     value={formData.startTimeline}
                     onChange={handleChange}
                     className="form-input"
+                    style={fieldErrors.startTimeline ? { borderBottomColor: '#c0392b' } : {}}
                   >
                     {START_OPTIONS.map(opt => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
+                  {fieldErrors.startTimeline && <p style={errStyle}>{fieldErrors.startTimeline}</p>}
                 </div>
 
                 {/* Message */}
                 <div style={{ marginBottom: '2rem' }}>
-                  <label className="form-label" htmlFor="contact-message">Message</label>
+                  <label className="form-label" htmlFor="contact-message">
+                    Message
+                    {formData.message.length > 0 && (
+                      <span style={{ float: 'right', fontWeight: 400, opacity: 0.5 }}>
+                        {formData.message.length}/1000
+                      </span>
+                    )}
+                  </label>
                   <textarea
                     id="contact-message"
                     name="message"
@@ -327,8 +490,10 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleChange}
                     className="form-input"
-                    style={{ resize: 'none', lineHeight: 1.7 }}
+                    style={{ resize: 'none', lineHeight: 1.7, ...(fieldErrors.message ? { borderBottomColor: '#c0392b' } : {}) }}
+                    maxLength={1000}
                   />
+                  {fieldErrors.message && <p style={errStyle}>{fieldErrors.message}</p>}
                 </div>
 
                 {error && (

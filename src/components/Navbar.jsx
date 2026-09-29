@@ -75,7 +75,7 @@ export default function Navbar() {
         }}
       >
         <div className="container-main">
-          <div className="flex items-center justify-between py-2.5 sm:py-3">
+          <div className="flex items-center justify-between py-1.5 sm:py-2">
             {/* Logo */}
             <a
               href="#home"
@@ -87,9 +87,9 @@ export default function Navbar() {
               <img
                 src="/logo-white.png"
                 alt="Studio Eshanya"
-                className="h-7 sm:h-8 md:h-9 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
+                className="h-10 sm:h-11 md:h-12 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
                 style={{
-                  maxHeight: '36px',
+                  maxHeight: '52px',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
                   pointerEvents: 'none',
@@ -142,7 +142,7 @@ export default function Navbar() {
                 </svg>
               </a>
               <a
-                href="https://linkedin.com/company/studioeshanya"
+                href="https://www.linkedin.com/company/studio-eshanya/"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ pointerEvents: 'auto', color: 'rgba(255,255,255,0.75)', transition: 'color 0.3s' }}
