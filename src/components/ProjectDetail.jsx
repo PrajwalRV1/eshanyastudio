@@ -1,30 +1,74 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { gsap } from 'gsap';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { projects } from '../data/projects';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import WhatsAppButton from './WhatsAppButton';
 
-export default function ProjectDetail({ project, onClose }) {
+export default function ProjectDetail() {
+  const { slug } = useParams();
   const [lightboxImg, setLightboxImg] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const modalRef = useRef(null);
 
+  // Find project by slug, altSlug, or id
+  const currentProject = projects.find(
+    (p) => p.slug === slug || p.altSlug === slug || String(p.id) === slug
+  ) || projects[0];
+
+  const currentIndex = projects.findIndex((p) => p.id === currentProject.id);
+  const prevProject = projects[(currentIndex - 1 + projects.length) % projects.length];
+  const nextProject = projects[(currentIndex + 1) % projects.length];
+
+  // Scroll to top and update dynamic SEO on project switch
   useEffect(() => {
-    if (modalRef.current) {
-      gsap.fromTo(modalRef.current,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
-      );
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (!currentProject) return;
+
+    const prevTitle = document.title;
+    document.title = `${currentProject.name} | ${currentProject.type} in ${currentProject.location} | Studio Eshanya`;
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const prevDesc = metaDesc ? metaDesc.getAttribute('content') : '';
+    if (metaDesc) {
+      metaDesc.setAttribute('content', currentProject.description);
     }
-    // Lock scroll
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
+
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const prevCanonical = canonical ? canonical.getAttribute('href') : '';
+    if (canonical) {
+      canonical.setAttribute('href', `https://studioeshanya.com/projects/${currentProject.slug}`);
+    }
+
+    return () => {
+      document.title = prevTitle;
+      if (metaDesc && prevDesc) metaDesc.setAttribute('content', prevDesc);
+      if (canonical && prevCanonical) canonical.setAttribute('href', prevCanonical);
+    };
+  }, [currentProject]);
+
+  const openLightbox = (img, idx) => {
+    setLightboxImg(img);
+    setLightboxIndex(idx);
+  };
+
+  const nextLightbox = useCallback(() => {
+    if (!currentProject.gallery || currentProject.gallery.length === 0) return;
+    const next = (lightboxIndex + 1) % currentProject.gallery.length;
+    setLightboxIndex(next);
+    setLightboxImg(currentProject.gallery[next]);
+  }, [currentProject, lightboxIndex]);
+
+  const prevLightbox = useCallback(() => {
+    if (!currentProject.gallery || currentProject.gallery.length === 0) return;
+    const prev = (lightboxIndex - 1 + currentProject.gallery.length) % currentProject.gallery.length;
+    setLightboxIndex(prev);
+    setLightboxImg(currentProject.gallery[prev]);
+  }, [currentProject, lightboxIndex]);
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') {
-        if (lightboxImg) setLightboxImg(null);
-        else onClose();
-      }
+      if (e.key === 'Escape') setLightboxImg(null);
       if (lightboxImg) {
         if (e.key === 'ArrowRight') nextLightbox();
         if (e.key === 'ArrowLeft') prevLightbox();
@@ -32,221 +76,308 @@ export default function ProjectDetail({ project, onClose }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [lightboxImg, lightboxIndex]);
+  }, [lightboxImg, nextLightbox, prevLightbox]);
 
-  const openLightbox = (img, idx) => {
-    setLightboxImg(img);
-    setLightboxIndex(idx);
-  };
-
-  const nextLightbox = () => {
-    const next = (lightboxIndex + 1) % project.gallery.length;
-    setLightboxIndex(next);
-    setLightboxImg(project.gallery[next]);
-  };
-
-  const prevLightbox = () => {
-    const prev = (lightboxIndex - 1 + project.gallery.length) % project.gallery.length;
-    setLightboxIndex(prev);
-    setLightboxImg(project.gallery[prev]);
-  };
+  useEffect(() => {
+    if (lightboxImg) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [lightboxImg]);
 
   return (
-    <>
-      {/* Full-page overlay */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'var(--parchment)',
-          zIndex: 2000,
-          overflowY: 'auto',
-        }}
-        ref={modalRef}
-      >
-        {/* Top Nav */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            background: 'rgba(234, 230, 223, 0.95)',
-            backdropFilter: 'blur(8px)',
-            zIndex: 10,
-            borderBottom: '1px solid rgba(0,0,0,0.08)',
-          }}
-        >
-          <div className="container-main" style={{ paddingTop: '1rem', paddingBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <button
-              onClick={onClose}
-              style={{
-                pointerEvents: 'auto',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '0.72rem',
-                fontWeight: 500,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--charcoal)',
-                transition: 'color 0.3s ease',
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--terracotta)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--charcoal)'}
-            >
-              <ArrowLeft size={14} /> Back to Selected Works
-            </button>
+    <div style={{ minHeight: '100vh', background: 'var(--parchment)' }}>
+      {/* Top Navbar */}
+      <Navbar />
 
-            <button
-              onClick={onClose}
+      {/* Main Project Content */}
+      <main style={{ paddingTop: '7rem', paddingBottom: '6rem' }}>
+        <div className="container-main">
+          {/* Back to Selected Works link */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <Link
+              to="/#portfolio"
               style={{
-                pointerEvents: 'auto',
-                background: 'transparent',
-                border: '1px solid rgba(0,0,0,0.2)',
-                width: '36px',
-                height: '36px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--charcoal)',
-                transition: 'all 0.3s ease',
-              }}
-              aria-label="Close project view"
-              onMouseEnter={e => { e.currentTarget.style.background = 'var(--charcoal)'; e.currentTarget.style.color = 'white'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--charcoal)'; }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Project Content */}
-        <div className="container-main" style={{ paddingTop: '4rem', paddingBottom: '6rem' }}>
-          {/* Project Header */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-10">
-            <div>
-              <p style={{
+                textDecoration: 'none',
                 fontFamily: 'Inter, sans-serif',
                 fontSize: '0.75rem',
                 fontWeight: 500,
-                letterSpacing: '0.08em',
-                color: 'var(--terracotta)',
-                marginBottom: '0.5rem',
-              }}>
-                Project {String(project.id).padStart(2, '0')}
-              </p>
-              <h1 style={{
-                fontFamily: 'Playfair Display, serif',
-                fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                fontWeight: 500,
-                color: 'var(--charcoal)',
-                lineHeight: 1.1,
-                marginBottom: '1rem',
-              }}>
-                {project.name}
-              </h1>
-              {/* Metadata */}
-              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                <div>
-                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Type</p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--charcoal)' }}>{project.type}</p>
-                </div>
-                <div>
-                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Location</p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--charcoal)' }}>{project.location}</p>
-                </div>
-                <div>
-                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Year</p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--charcoal)' }}>{project.year}</p>
-                </div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-              <p style={{
-                fontSize: '1rem',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
                 color: 'var(--charcoal)',
                 opacity: 0.75,
-                lineHeight: 1.85,
-              }}>
-                {project.description}
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.75')}
+            >
+              <ArrowLeft size={14} /> Back to Selected Works
+            </Link>
+          </div>
+
+          {/* Project Header (Grid) */}
+          <div
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
+            style={{
+              marginBottom: '3rem',
+              paddingBottom: '2.5rem',
+              borderBottom: '1px solid var(--hairline)',
+            }}
+          >
+            <div className="lg:col-span-6">
+              <span
+                style={{
+                  fontFamily: 'Playfair Display, serif',
+                  fontSize: '0.9rem',
+                  color: 'var(--terracotta)',
+                  display: 'block',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Project {currentProject.number || String(currentProject.id).padStart(2, '0')}
+              </span>
+              <h1
+                style={{
+                  fontFamily: 'Playfair Display, serif',
+                  fontSize: 'var(--text-heading)',
+                  lineHeight: 1.1,
+                  fontWeight: 500,
+                  color: 'var(--charcoal)',
+                  marginBottom: '1rem',
+                }}
+              >
+                {currentProject.name}
+              </h1>
+              {currentProject.subtitle && (
+                <p
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '0.8rem',
+                    color: 'var(--charcoal)',
+                    opacity: 0.6,
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  {currentProject.subtitle}
+                </p>
+              )}
+            </div>
+
+            <div className="lg:col-span-6 flex flex-col justify-end">
+              <p
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 'var(--text-body)',
+                  lineHeight: 1.85,
+                  color: 'var(--charcoal)',
+                  opacity: 0.85,
+                }}
+              >
+                {currentProject.description}
               </p>
             </div>
           </div>
 
-          <hr className="hairline" style={{ marginBottom: '3rem' }} />
-
-          {/* Hero Image */}
-          <div style={{ overflow: 'hidden', marginBottom: '3rem' }}>
+          {/* Cover Feature Banner Image */}
+          <div
+            style={{
+              marginBottom: '4rem',
+              overflow: 'hidden',
+              border: '1px solid var(--hairline)',
+              background: 'rgba(0,0,0,0.05)',
+              maxHeight: '680px',
+              aspectRatio: '21/10',
+            }}
+          >
             <img
-              src={project.coverImage}
-              alt={project.name}
-              className="w-full object-cover"
+              src={currentProject.coverImage}
+              alt={`${currentProject.name} — Cover Feature`}
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-[1.02]"
               style={{
-                height: 'clamp(300px, 55vw, 600px)',
+                display: 'block',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
                 pointerEvents: 'none',
               }}
               draggable={false}
-              onContextMenu={e => e.preventDefault()}
+              onContextMenu={(e) => e.preventDefault()}
             />
           </div>
 
-          {/* Gallery */}
-          <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', fontWeight: 500, color: 'var(--charcoal)' }}>
+          {/* Project Gallery Header */}
+          <div
+            style={{
+              marginBottom: '2rem',
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid var(--hairline)',
+              paddingBottom: '1rem',
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: 'var(--text-subheading)',
+                fontWeight: 500,
+                color: 'var(--charcoal)',
+              }}
+            >
               Project Gallery
             </h2>
-            <span style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '0.65rem',
-              fontWeight: 500,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: 'var(--charcoal)',
-              opacity: 0.45,
-            }}>
-              {project.gallery.length} Photographs
+            <span
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.72rem',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--charcoal)',
+                opacity: 0.5,
+              }}
+            >
+              {currentProject.gallery?.length || 0} Photographs
             </span>
           </div>
 
-          <hr className="hairline" style={{ marginBottom: '2rem' }} />
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {project.gallery.map((img, idx) => (
+          {/* Masonry / Multi-column Gallery */}
+          <div
+            className="columns-1 md:columns-2 lg:columns-3 gap-6 md:gap-8 mb-20 md:mb-28 [column-fill:balance]"
+          >
+            {currentProject.gallery?.map((img, idx) => (
               <div
                 key={idx}
-                style={{ overflow: 'hidden', cursor: 'zoom-in', position: 'relative' }}
-                onClick={() => openLightbox(img, idx)}
+                className="group break-inside-avoid mb-6 md:mb-8"
+                style={{ overflow: 'hidden' }}
               >
-                <img
-                  src={img}
-                  alt={`${project.name} — photo ${idx + 1}`}
-                  className="w-full object-cover lightbox-trigger"
+                <button
+                  type="button"
+                  onClick={() => openLightbox(img, idx)}
+                  className="w-full bg-[var(--parchment-light)] border border-[var(--hairline)] transition-opacity duration-300 group-hover:opacity-90 cursor-zoom-in"
                   style={{
-                    height: '220px',
                     display: 'block',
-                    transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    pointerEvents: 'auto',
+                    padding: 0,
+                    margin: 0,
+                    background: 'transparent',
+                    cursor: 'zoom-in',
+                    border: '1px solid var(--hairline)',
+                    overflow: 'hidden',
                   }}
-                  draggable={false}
-                  onContextMenu={e => e.preventDefault()}
-                  onMouseEnter={e => e.target.style.transform = 'scale(1.04)'}
-                  onMouseLeave={e => e.target.style.transform = 'scale(1)'}
-                />
+                  aria-label={`View full image: ${currentProject.name} photo ${idx + 1}`}
+                >
+                  <img
+                    src={img}
+                    alt={`${currentProject.name} — view ${idx + 1}`}
+                    className="w-full h-auto object-contain transition-transform duration-500 hover:scale-[1.03]"
+                    style={{
+                      display: 'block',
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                    }}
+                    loading="lazy"
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Gallery Lightbox */}
+          {/* Bottom Project Navigation */}
+          <div
+            style={{
+              borderTop: '1px solid var(--hairline)',
+              paddingTop: '2.5rem',
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1.5rem',
+            }}
+          >
+            <Link
+              to={`/projects/${prevProject.slug}`}
+              style={{
+                textDecoration: 'none',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--charcoal)',
+                opacity: 0.8,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}
+            >
+              <ArrowLeft size={14} /> Previous: {prevProject.name}
+            </Link>
+
+            <Link
+              to="/#portfolio"
+              style={{
+                textDecoration: 'none',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--charcoal)',
+                opacity: 0.65,
+                borderBottom: '1px solid rgba(0,0,0,0.3)',
+                paddingBottom: '2px',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.borderColor = 'var(--charcoal)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.65';
+                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.3)';
+              }}
+            >
+              All Selected Works
+            </Link>
+
+            <Link
+              to={`/projects/${nextProject.slug}`}
+              style={{
+                textDecoration: 'none',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--charcoal)',
+                opacity: 0.8,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}
+            >
+              Next: {nextProject.name} <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      {/* Lightbox Zoom Viewer */}
       {lightboxImg && (
         <div
           className="lightbox-overlay"
@@ -256,86 +387,115 @@ export default function ProjectDetail({ project, onClose }) {
           aria-modal="true"
           aria-label="Image viewer"
         >
-          <button className="lightbox-close" onClick={() => setLightboxImg(null)} aria-label="Close">
+          <button
+            className="lightbox-close"
+            onClick={() => setLightboxImg(null)}
+            aria-label="Close"
+          >
             <X size={18} />
           </button>
 
           {/* Prev */}
           <button
-            onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              prevLightbox();
+            }}
             style={{
               pointerEvents: 'auto',
               position: 'fixed',
-              left: '1rem',
+              left: '1.25rem',
               top: '50%',
               transform: 'translateY(-50%)',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.25)',
               color: 'white',
               cursor: 'pointer',
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 10001,
+              transition: 'background 0.2s',
             }}
             aria-label="Previous image"
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={22} />
           </button>
 
           <img
             src={lightboxImg}
-            alt={`Project photo ${lightboxIndex + 1}`}
+            alt={`${currentProject.name} photo ${lightboxIndex + 1}`}
             className="lightbox-image"
-            onClick={e => e.stopPropagation()}
-            onContextMenu={e => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.preventDefault()}
             draggable={false}
           />
 
           {/* Next */}
           <button
-            onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              nextLightbox();
+            }}
             style={{
               pointerEvents: 'auto',
               position: 'fixed',
-              right: '1rem',
+              right: '1.25rem',
               top: '50%',
               transform: 'translateY(-50%)',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.25)',
               color: 'white',
               cursor: 'pointer',
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 10001,
+              transition: 'background 0.2s',
             }}
             aria-label="Next image"
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={22} />
           </button>
 
           {/* Counter */}
-          <div style={{
-            position: 'fixed',
-            bottom: '1.5rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            color: 'rgba(255,255,255,0.5)',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '0.75rem',
-            letterSpacing: '0.1em',
-            zIndex: 10001,
-            pointerEvents: 'none',
-          }}>
-            {lightboxIndex + 1} / {project.gallery.length}
+          <div
+            style={{
+              position: 'fixed',
+              bottom: '1.5rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              color: 'rgba(255,255,255,0.7)',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '0.75rem',
+              letterSpacing: '0.12em',
+              zIndex: 10001,
+              pointerEvents: 'none',
+              background: 'rgba(0,0,0,0.4)',
+              padding: '0.35rem 0.85rem',
+              borderRadius: '999px',
+            }}
+          >
+            {lightboxIndex + 1} / {currentProject.gallery?.length || 0}
           </div>
         </div>
       )}
-    </>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* WhatsApp Button */}
+      <WhatsAppButton />
+    </div>
   );
 }

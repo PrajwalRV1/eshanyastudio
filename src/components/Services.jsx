@@ -44,7 +44,7 @@ export default function Services() {
                 className="service-header-reveal"
                 style={{
                   fontFamily: 'Playfair Display, serif',
-                  fontSize: 'clamp(2rem, 4.5vw, 3.2rem)',
+                  fontSize: 'var(--text-heading)',
                   fontWeight: 500,
                   marginBottom: '0.5rem',
                   color: 'var(--charcoal)',
@@ -56,9 +56,9 @@ export default function Services() {
                 className="service-header-reveal"
                 style={{
                   fontFamily: 'Playfair Display, serif',
-                  fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                  fontSize: 'var(--text-subheading)',
                   color: 'var(--charcoal)',
-                  opacity: 0.65,
+                  opacity: 0.75,
                 }}
               >
                 Thoughtful spaces, at every scale.
@@ -70,7 +70,7 @@ export default function Services() {
                 style={{
                   fontFamily: 'Playfair Display, serif',
                   fontStyle: 'italic',
-                  fontSize: '0.95rem',
+                  fontSize: 'var(--text-body)',
                   color: 'var(--charcoal)',
                   opacity: 0.7,
                   lineHeight: 1.75,
@@ -113,7 +113,7 @@ export default function Services() {
                 {/* Title */}
                 <h3 style={{
                   fontFamily: 'Playfair Display, serif',
-                  fontSize: '1.5rem',
+                  fontSize: 'var(--text-subheading)',
                   fontWeight: 500,
                   marginBottom: '0.35rem',
                   color: 'var(--charcoal)',
@@ -139,7 +139,7 @@ export default function Services() {
 
                 {/* Description */}
                 <p style={{
-                  fontSize: '0.875rem',
+                  fontSize: 'var(--text-body)',
                   color: 'var(--charcoal)',
                   opacity: 0.75,
                   lineHeight: 1.75,

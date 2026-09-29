@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import sitoutImg from '../assets/assets/04 Portfolio - Images/Project 7/studio-eshanya-banangala-residential-architecture-dharmasthala-sitout.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,8 +28,8 @@ export default function BengaluruSection() {
           {/* Left — Image */}
           <div className="bengaluru-reveal" style={{ overflow: 'hidden' }}>
             <img
-              src="/images/projects/p7/exterior.png"
-              alt="Studio Eshanya — Bengaluru Architecture"
+              src={sitoutImg}
+              alt="Studio Eshanya — Architecture & Living"
               className="w-full object-cover"
               style={{
                 height: 'clamp(380px, 50vw, 580px)',
@@ -47,7 +48,7 @@ export default function BengaluruSection() {
               className="bengaluru-reveal"
               style={{
                 fontFamily: 'Playfair Display, serif',
-                fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+                fontSize: 'var(--text-heading)',
                 fontWeight: 500,
                 lineHeight: 1.25,
                 marginBottom: '1.5rem',
@@ -58,7 +59,7 @@ export default function BengaluruSection() {
             </h2>
             <p
               className="bengaluru-reveal"
-              style={{ fontSize: '0.95rem', color: 'var(--charcoal)', opacity: 0.75, lineHeight: 1.85, maxWidth: '440px' }}
+              style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.75, lineHeight: 1.85, maxWidth: '440px' }}
             >
               Based in HSR Layout, Bengaluru, Studio Eshanya approaches architecture and interior spaces with a contemporary sensibility grounded in comfort, functionality and thoughtful detail.
             </p>

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,36 +14,86 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import LeadGenPopup from './components/LeadGenPopup';
+import ProjectDetail from './components/ProjectDetail';
 
 gsap.registerPlugin(ScrollTrigger);
 
 // Global right-click protection for all images
 if (typeof window !== 'undefined') {
-  // Block context menu on any image or element containing an image
-  document.addEventListener('contextmenu', (e) => {
-    if (
-      e.target.tagName === 'IMG' ||
-      e.target.closest('[data-no-context]') ||
-      e.target.closest('.portfolio-card') ||
-      e.target.closest('.project-slider-overlay') ||
-      e.target.closest('.slider-image-area') ||
-      e.target.closest('.lightbox-overlay') ||
-      e.target.closest('#about') ||
-      e.target.closest('#services') ||
-      e.target.closest('#portfolio') ||
-      e.target.closest('.contact-section') ||
-      e.target.closest('.site-footer') ||
-      e.target.closest('.hero-section')
-    ) {
-      e.preventDefault();
+  document.addEventListener(
+    'contextmenu',
+    (e) => {
+      if (
+        e.target.tagName === 'IMG' ||
+        e.target.closest('[data-no-context]') ||
+        e.target.closest('.portfolio-card') ||
+        e.target.closest('.lightbox-overlay') ||
+        e.target.closest('#about') ||
+        e.target.closest('#services') ||
+        e.target.closest('#portfolio') ||
+        e.target.closest('.contact-section') ||
+        e.target.closest('.site-footer') ||
+        e.target.closest('.hero-section')
+      ) {
+        e.preventDefault();
+      }
+    },
+    true
+  );
+}
+
+// Scroll restoration and hash scrolling helper
+function ScrollManager() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 120);
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }, true); // capture phase
+  }, [pathname, hash]);
+
+  return null;
+}
+
+function HomePage() {
+  return (
+    <div style={{ minHeight: '100vh' }}>
+      {/* Navigation */}
+      <Navbar />
+
+      {/* Main Content */}
+      <main>
+        <Hero />
+        <About />
+        <Services />
+        <Portfolio />
+        <BengaluruSection />
+        <Contact />
+      </main>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Floating Elements */}
+      <WhatsAppButton />
+
+      {/* Lead Gen Popup */}
+      <LeadGenPopup />
+    </div>
+  );
 }
 
 export default function App() {
   const lenisRef = useRef(null);
 
-  // Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -56,7 +107,6 @@ export default function App() {
 
     lenisRef.current = lenis;
 
-    // Connect Lenis to GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
@@ -71,33 +121,15 @@ export default function App() {
     };
   }, []);
 
-
-
   return (
-    <div style={{ minHeight: '100vh' }}>
-      {/* Navigation */}
-      <Navbar />
-
-      {/* Main Content */}
-      <main>
-        <Hero />
-        <About />
-        <Services />
-        <Portfolio />
-        {/* "Designed for the way Bengaluru lives" — moved here, after Portfolio */}
-        <BengaluruSection />
-        {/* Process / How We Work section removed as per request */}
-        <Contact />
-      </main>
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Floating Elements */}
-      <WhatsAppButton />
-
-      {/* Lead Gen Popup — Task 4.2 */}
-      <LeadGenPopup />
-    </div>
+    <>
+      <ScrollManager />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projects/:slug" element={<ProjectDetail />} />
+        {/* Fallback to Home */}
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+    </>
   );
 }

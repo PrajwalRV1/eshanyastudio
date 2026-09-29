@@ -65,13 +65,15 @@ export default function Navbar() {
     <>
       <header
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{
           background: scrolled
-            ? 'rgba(26, 26, 26, 0.97)'
+            ? 'rgba(20, 20, 20, 0.55)'
             : 'rgba(26, 26, 26, 0.35)',
-          backdropFilter: scrolled ? 'blur(12px)' : 'blur(4px)',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          backdropFilter: scrolled ? 'blur(16px)' : 'blur(4px)',
+          WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'blur(4px)',
+          borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+          boxShadow: scrolled ? '0 4px 30px rgba(0, 0, 0, 0.12)' : 'none',
         }}
       >
         <div className="container-main">
@@ -87,9 +89,9 @@ export default function Navbar() {
               <img
                 src="/logo-white.png"
                 alt="Studio Eshanya"
-                className="h-10 sm:h-11 md:h-12 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
+                className="h-12 sm:h-12 md:h-12 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
                 style={{
-                  maxHeight: '52px',
+                  maxHeight: '54px',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
                   pointerEvents: 'none',

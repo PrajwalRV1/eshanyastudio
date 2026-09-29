@@ -47,6 +47,22 @@ export default function Footer() {
               </a>
             </div>
 
+            {/* Studio Info */}
+            <div
+              style={{
+                marginBottom: '1.5rem',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.82rem',
+                lineHeight: 1.65,
+                color: 'rgba(255, 255, 255, 0.75)',
+              }}
+            >
+              <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.95)', fontWeight: 500 }}>Studio Eshanya</p>
+              <p style={{ margin: 0 }}>Architecture &amp; Interior Design Studio</p>
+              <p style={{ margin: 0 }}>HSR Layout, Bengaluru, Karnataka</p>
+              <p style={{ margin: 0 }}>Serving Bengaluru &amp; surrounding areas</p>
+            </div>
+
             {/* Social Icons */}
             <div style={{ display: 'flex', gap: '1rem' }}>
               {[

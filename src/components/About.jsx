@@ -6,17 +6,8 @@ import { designPrinciples } from '../data/projects';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Task 3.2: Replace text block — these are the exact replacement strings
-const PHILOSOPHY_LINES = [
-  'We design with direction.',
-  'We create with purpose.',
-  'We shape spaces that endure.',
-];
-
 export default function About() {
   const sectionRef = useRef(null);
-  const headingRef = useRef(null);
-  const philosophyRef = useRef(null);
   const principlesRef = useRef(null);
 
   useEffect(() => {
@@ -27,7 +18,7 @@ export default function About() {
         {
           opacity: 1, y: 0,
           duration: 1,
-          stagger: 0.15,
+          stagger: 0.12,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '#about',
@@ -47,22 +38,6 @@ export default function About() {
           scrollTrigger: {
             trigger: '#about',
             start: 'top 65%',
-            toggleActions: 'play none none none',
-          }
-        }
-      );
-
-      // Philosophy text
-      gsap.fromTo('.philosophy-line',
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1, y: 0,
-          stagger: 0.2,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: philosophyRef.current,
-            start: 'top 75%',
             toggleActions: 'play none none none',
           }
         }
@@ -102,7 +77,7 @@ export default function About() {
                 className="about-text-reveal"
                 style={{
                   fontFamily: 'Playfair Display, serif',
-                  fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+                  fontSize: 'var(--text-heading)',
                   fontWeight: 500,
                   lineHeight: 1.15,
                   marginBottom: '2rem',
@@ -112,16 +87,37 @@ export default function About() {
                 A direction.<br />A way of seeing.
               </h2>
 
-              <div style={{ color: 'var(--charcoal)', opacity: 0.8, lineHeight: 1.8 }}>
-                <p className="about-text-reveal mb-5" style={{ fontSize: '0.95rem' }}>
+              <div style={{ color: 'var(--charcoal)', opacity: 0.85, lineHeight: 1.8 }}>
+                <p className="about-text-reveal mb-5" style={{ fontSize: 'var(--text-body)' }}>
                   Eshanya draws from the Sanskrit word associated with the northeastern direction, traditionally symbolising light, clarity, balance and positive beginnings.
                 </p>
-                <p className="about-text-reveal mb-5" style={{ fontSize: '0.95rem' }}>
+                <p className="about-text-reveal mb-5" style={{ fontSize: 'var(--text-body)' }}>
                   Established in 2023 by Principal Architect Suhas, Studio Eshanya is an architecture and interior design practice creating thoughtful spaces shaped around people, place and purpose.
                 </p>
-                <p className="about-text-reveal" style={{ fontSize: '0.95rem' }}>
+                <p className="about-text-reveal mb-5" style={{ fontSize: 'var(--text-body)' }}>
                   For us, Eshanya is more than a direction.
                 </p>
+                <p className="about-text-reveal mb-5" style={{ fontSize: 'var(--text-body)' }}>
+                  It is a philosophy that guides how we approach every space.
+                </p>
+                <div className="about-text-reveal mb-6" style={{ fontSize: 'var(--text-body)', fontWeight: 500, color: 'var(--charcoal)', lineHeight: 1.6 }}>
+                  <p style={{ margin: 0, marginBottom: '0.2rem' }}>We design with direction.</p>
+                  <p style={{ margin: 0, marginBottom: '0.2rem' }}>We create with purpose.</p>
+                  <p style={{ margin: 0 }}>We shape spaces that endure.</p>
+                </div>
+                <div className="about-text-reveal">
+                  <a
+                    href="#services"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="cta-link"
+                    style={{ pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-body)' }}
+                  >
+                    See What We Do <ArrowRight size={13} />
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -147,81 +143,34 @@ export default function About() {
         </div>
       </div>
 
-      {/* ===== PHILOSOPHY BLOCK (Task 3.2 replacement text) ===== */}
-      <div
-        ref={philosophyRef}
-        className="about-block-philosophy"
-      >
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            {/* Left — Philosophy Text */}
-            <div>
-              {/* Task 3.2: REPLACEMENT text block */}
-              {PHILOSOPHY_LINES.map((line, i) => (
-                <h2
-                  key={i}
-                  className="philosophy-line"
-                  style={{
-                    fontFamily: 'Playfair Display, serif',
-                    fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)',
-                    fontWeight: 500,
-                    lineHeight: 1.35,
-                    marginBottom: '0.25rem',
-                    color: 'var(--charcoal)',
-                  }}
-                >
-                  {line}
-                </h2>
-              ))}
-
-              <a
-                href="#services"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="cta-link philosophy-line"
-                style={{ marginTop: '2.5rem', pointerEvents: 'auto' }}
-              >
-                See What We Do <ArrowRight size={13} />
-              </a>
-            </div>
-
-            {/* Right — Image (terracotta panel detail) */}
-            <div className="about-image-reveal">
-              <img
-                src="/images/projects/p5/living-detail.png"
-                alt="Studio Eshanya — Crafted Detail"
-                className="w-full object-cover"
-                style={{
-                  height: 'clamp(320px, 40vw, 500px)',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  pointerEvents: 'none',
-                }}
-                draggable={false}
-                onContextMenu={e => e.preventDefault()}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ===== DESIGN PRINCIPLES GRID ===== */}
       <div
         ref={principlesRef}
         className="about-block-principles"
       >
         <div className="container-main">
+          {/* Header */}
+          <h2
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'var(--text-heading)',
+              fontWeight: 500,
+              lineHeight: 1.15,
+              marginBottom: '2rem',
+              color: 'var(--charcoal)',
+            }}
+          >
+            A quieter approach to design.
+          </h2>
+
           {/* Quote */}
           <p
-            className="philosophy-line"
             style={{
               fontFamily: 'Playfair Display, serif',
               fontStyle: 'italic',
-              fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+              fontSize: 'var(--text-body)',
               color: 'var(--charcoal)',
-              opacity: 0.65,
+              opacity: 0.75,
               marginBottom: '3.5rem',
               maxWidth: '700px',
               lineHeight: 1.6,
@@ -264,7 +213,7 @@ export default function About() {
                 }}>
                   {p.title}
                 </h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--charcoal)', opacity: 0.75, lineHeight: 1.75 }}>
+                <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.75, lineHeight: 1.75 }}>
                   {p.description}
                 </p>
               </div>

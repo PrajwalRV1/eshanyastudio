@@ -45,7 +45,7 @@ export default function Hero() {
     );
   }, []);
 
-  const nextSlide = () => goToSlide((currentSlide + 1) % heroSlides.length);
+  const _nextSlide = () => goToSlide((currentSlide + 1) % heroSlides.length);
 
   return (
     <section

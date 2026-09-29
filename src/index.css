@@ -22,6 +22,11 @@
   --text-muted: #6B6560;
   --hairline: rgba(0,0,0,0.12);
   --transition-premium: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ── 3 Standardized Typography Sizes for Entire Website ── */
+  --text-heading: clamp(2rem, 4.5vw, 2.85rem);     /* Tier 1: Main Section Headings */
+  --text-subheading: clamp(1.15rem, 2vw, 1.35rem); /* Tier 2: Subheadings & Titles */
+  --text-body: 0.925rem;                           /* Tier 3: Body, Descriptions, UI & Nav */
 }
 
 html {
@@ -32,6 +37,7 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
+  font-size: var(--text-body);
   background-color: var(--parchment);
   color: var(--charcoal);
   overflow-x: hidden;
@@ -50,13 +56,27 @@ html.lenis {
 }
 
 /* ============================================
-   TYPOGRAPHY
+   TYPOGRAPHY — STANDARDIZED 3 SIZES
    ============================================ */
-h1, h2, h3, h4 {
+h1, h2 {
   font-family: 'Playfair Display', Georgia, serif;
-  line-height: 1.2;
+  font-size: var(--text-heading);
+  line-height: 1.18;
   font-weight: 500;
   color: var(--charcoal);
+}
+
+h3, h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: var(--text-subheading);
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+p, span, a, button, input, select, textarea, label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: var(--text-body);
 }
 
 .font-display {
@@ -573,8 +593,8 @@ select.form-input {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  width: 52px;
-  height: 52px;
+  width: 42px;
+  height: 42px;
   background: #25D366;
   border-radius: 50%;
   display: flex;
@@ -582,7 +602,7 @@ select.form-input {
   justify-content: center;
   z-index: 1000;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   pointer-events: auto;
 }
@@ -1116,8 +1136,8 @@ html, body {
   .whatsapp-btn {
     bottom: 1.25rem !important;
     right: 1.25rem !important;
-    width: 48px !important;
-    height: 48px !important;
+    width: 42px !important;
+    height: 42px !important;
   }
 
   .modal-card {
@@ -1140,7 +1160,8 @@ html, body {
 /* ── Navbar Header on Mobile ── */
 @media (max-width: 768px) {
   header img[src*="logo"] {
-    max-height: 44px !important;
+    max-height: 52px !important;
+    height: 50px !important;
   }
 }
 

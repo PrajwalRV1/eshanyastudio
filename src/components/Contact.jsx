@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowRight, MapPin, Phone, Mail } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { WEB3FORMS_ENDPOINT, WEB3FORMS_ACCESS_KEY } from '../config/forms';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,8 +31,6 @@ const PROJECT_TYPES = [
   { value: 'design-consultancy', label: 'Design Consultancy' },
   { value: 'other', label: 'Other' },
 ];
-
-const FORM_ENDPOINT = 'https://formspree.io/f/enquiry.studioeshanya';
 
 // ── Sanitize text — strip HTML/script injection
 function sanitizeText(val) {
@@ -165,25 +164,29 @@ export default function Contact() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(FORM_ENDPOINT, {
+      const res = await fetch(WEB3FORMS_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `New Studio Eshanya Enquiry from ${formData.name.trim()} (${formData.projectType || 'Project'})`,
+          from_name: 'Studio Eshanya Website',
           name: formData.name.trim(),
           phone: formData.phone,
           email: formData.email.trim(),
-          projectType: formData.projectType,
-          projectLocation: formData.projectLocation.trim(),
-          startTimeline: formData.startTimeline,
+          project_type: formData.projectType,
+          project_location: formData.projectLocation.trim(),
+          start_timeline: formData.startTimeline,
           message: formData.message.trim(),
         }),
       });
-      if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success !== false) {
         setSubmitted(true);
         setFormData({ name: '', phone: '', email: '', projectType: '', projectLocation: '', startTimeline: '', message: '' });
         setFieldErrors({});
       } else {
-        setError('Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
+        setError(data.message || 'Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
       }
     } catch {
       setError('Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
@@ -211,7 +214,7 @@ export default function Contact() {
               className="contact-reveal"
               style={{
                 fontFamily: 'Playfair Display, serif',
-                fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                fontSize: 'var(--text-heading)',
                 fontWeight: 500,
                 lineHeight: 1.2,
                 marginBottom: '1rem',
@@ -222,7 +225,7 @@ export default function Contact() {
             </h2>
             <p
               className="contact-reveal"
-              style={{ fontSize: '0.9rem', color: 'var(--charcoal)', opacity: 0.7, lineHeight: 1.8, marginBottom: '2rem' }}
+              style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.7, lineHeight: 1.8, marginBottom: '2rem' }}
             >
               Tell us a little about your project and let's begin the conversation.
             </p>
@@ -232,10 +235,10 @@ export default function Contact() {
             {/* Location */}
             <div className="contact-reveal" style={{ marginBottom: '1.5rem' }}>
               <p className="eyebrow" style={{ marginBottom: '0.4rem' }}>Location</p>
-              <p style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.05rem', fontWeight: 500, marginBottom: '0.2rem', color: 'var(--charcoal)' }}>
+              <p style={{ fontFamily: 'Playfair Display, serif', fontSize: 'var(--text-subheading)', fontWeight: 500, marginBottom: '0.2rem', color: 'var(--charcoal)' }}>
                 HSR Layout, Bengaluru
               </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--charcoal)', opacity: 0.6, marginBottom: '0.85rem' }}>By Appointment Only</p>
+              <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.6, marginBottom: '0.85rem' }}>By Appointment Only</p>
               <a
                 href="https://maps.google.com/?q=Studio+Eshanya+HSR+Layout+Bengaluru"
                 target="_blank"
@@ -263,22 +266,21 @@ export default function Contact() {
               </a>
             </div>
 
-            {/* Direct Line — Task 7: monospace font for phone number */}
+            {/* Direct Line */}
             <div className="contact-reveal" style={{ marginBottom: '1.2rem' }}>
               <p className="eyebrow" style={{ marginBottom: '0.3rem' }}>Direct Line</p>
               <a
                 href="tel:+919110605559"
                 style={{
                   pointerEvents: 'auto',
-                  fontFamily: '"DM Mono", "Roboto Mono", "Courier New", monospace',
-                  fontSize: '1.2rem',
-                  fontWeight: 500,
-                  letterSpacing: '0.06em',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 'var(--text-body)',
                   color: 'var(--charcoal)',
                   textDecoration: 'none',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem',
+                  gap: '0.4rem',
+                  opacity: 0.8,
                 }}
               >
                 <Phone size={14} style={{ color: 'var(--terracotta)', flexShrink: 0 }} />
@@ -289,7 +291,7 @@ export default function Contact() {
             {/* Email */}
             <div className="contact-reveal" style={{ marginBottom: '1.2rem' }}>
               <p className="eyebrow" style={{ marginBottom: '0.3rem' }}>Email</p>
-              <a href="mailto:enquiry.studioeshanya@gmail.com" style={{ pointerEvents: 'auto', fontSize: '0.875rem', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
+              <a href="mailto:enquiry.studioeshanya@gmail.com" style={{ pointerEvents: 'auto', fontSize: 'var(--text-body)', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
                 <Mail size={14} style={{ color: 'var(--terracotta)' }} />
                 enquiry.studioeshanya@gmail.com
               </a>
@@ -298,7 +300,7 @@ export default function Contact() {
             {/* Instagram */}
             <div className="contact-reveal">
               <p className="eyebrow" style={{ marginBottom: '0.3rem' }}>Instagram</p>
-              <a href="https://instagram.com/studioeshanya" target="_blank" rel="noopener noreferrer" style={{ pointerEvents: 'auto', fontSize: '0.875rem', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
+              <a href="https://instagram.com/studioeshanya" target="_blank" rel="noopener noreferrer" style={{ pointerEvents: 'auto', fontSize: 'var(--text-body)', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
                 <InstagramIcon size={14} style={{ color: 'var(--terracotta)' }} />
                 @studioeshanya
               </a>
@@ -341,10 +343,10 @@ export default function Contact() {
                     <polyline points="22 4 12 14.01 9 11.01"/>
                   </svg>
                 </div>
-                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.5rem', marginBottom: '0.75rem', color: 'var(--charcoal)' }}>
+                <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'var(--text-subheading)', marginBottom: '0.75rem', color: 'var(--charcoal)' }}>
                   Thank you for reaching out.
                 </h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--charcoal)', opacity: 0.7, lineHeight: 1.75 }}>
+                <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.7, lineHeight: 1.75 }}>
                   We've received your enquiry and will be in touch within 24 hours.
                 </p>
               </div>
@@ -368,10 +370,10 @@ export default function Contact() {
                     {fieldErrors.name && <p style={errStyle}>{fieldErrors.name}</p>}
                   </div>
 
-                  {/* Phone — Task 8: digits only, exactly 10 */}
+                  {/* Phone */}
                   <div>
                     <label className="form-label" htmlFor="contact-phone">
-                      Phone * &nbsp;<span style={{ opacity: 0.55, fontWeight: 400, fontSize: '0.6rem' }}>(10-digit number)</span>
+                      Phone *
                     </label>
                     <input
                       id="contact-phone"
@@ -390,14 +392,6 @@ export default function Contact() {
                       maxLength={10}
                     />
                     {fieldErrors.phone && <p style={errStyle}>{fieldErrors.phone}</p>}
-                    {!fieldErrors.phone && formData.phone.length > 0 && formData.phone.length < 10 && (
-                      <p style={{ ...errStyle, color: 'var(--terracotta)' }}>
-                        {10 - formData.phone.length} more digit{10 - formData.phone.length !== 1 ? 's' : ''} needed
-                      </p>
-                    )}
-                    {!fieldErrors.phone && formData.phone.length === 10 && (
-                      <p style={{ ...errStyle, color: '#27ae60' }}>✓ Valid number</p>
-                    )}
                   </div>
                 </div>
 
