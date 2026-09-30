@@ -49,11 +49,22 @@ function ScrollManager() {
   useEffect(() => {
     if (hash) {
       const id = hash.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) {
-        setTimeout(() => {
+      const scrollToEl = () => {
+        const el = document.getElementById(id);
+        if (el) {
           el.scrollIntoView({ behavior: 'smooth' });
-        }, 120);
+          return true;
+        }
+        return false;
+      };
+
+      if (!scrollToEl()) {
+        const timer1 = setTimeout(scrollToEl, 80);
+        const timer2 = setTimeout(scrollToEl, 250);
+        return () => {
+          clearTimeout(timer1);
+          clearTimeout(timer2);
+        };
       }
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });

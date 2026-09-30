@@ -186,10 +186,10 @@ export default function Contact() {
         setFormData({ name: '', phone: '', email: '', projectType: '', projectLocation: '', startTimeline: '', message: '' });
         setFieldErrors({});
       } else {
-        setError(data.message || 'Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
+        setError(data.message || 'Something went wrong. Please email us directly at studioeshanya@gmail.com');
       }
     } catch {
-      setError('Something went wrong. Please email us directly at enquiry.studioeshanya@gmail.com');
+      setError('Something went wrong. Please email us directly at studioeshanya@gmail.com');
     } finally {
       setSubmitting(false);
     }
@@ -291,9 +291,9 @@ export default function Contact() {
             {/* Email */}
             <div className="contact-reveal" style={{ marginBottom: '1.2rem' }}>
               <p className="eyebrow" style={{ marginBottom: '0.3rem' }}>Email</p>
-              <a href="mailto:enquiry.studioeshanya@gmail.com" style={{ pointerEvents: 'auto', fontSize: 'var(--text-body)', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
+              <a href="mailto:studioeshanya@gmail.com" style={{ pointerEvents: 'auto', fontSize: 'var(--text-body)', color: 'var(--charcoal)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: 0.8 }}>
                 <Mail size={14} style={{ color: 'var(--terracotta)' }} />
-                enquiry.studioeshanya@gmail.com
+                studioeshanya@gmail.com
               </a>
             </div>
 

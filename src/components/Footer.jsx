@@ -1,8 +1,16 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 export default function Footer() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/#' + id);
+    }
   };
 
   return (
@@ -24,10 +32,10 @@ export default function Footer() {
             {/* Logo */}
             <div style={{ marginBottom: '1.5rem' }}>
               <a
-                href="#home"
+                href={location.pathname === '/' ? '#home' : '/#home'}
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+                  scrollTo('home');
                 }}
                 className="inline-block"
                 aria-label="Studio Eshanya Home"
@@ -177,12 +185,12 @@ export default function Footer() {
                 +91 91106 05559
               </a>
               <a
-                href="mailto:enquiry.studioeshanya@gmail.com"
+                href="mailto:studioeshanya@gmail.com"
                 style={{ pointerEvents: 'auto', color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '0.85rem', transition: 'color 0.3s', wordBreak: 'break-all' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.8)'}
               >
-                enquiry.studioeshanya@gmail.com
+                studioeshanya@gmail.com
               </a>
               <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.65 }}>
                 2nd Cross, 21st Main Road,<br />

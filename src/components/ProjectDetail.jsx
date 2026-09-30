@@ -47,6 +47,26 @@ export default function ProjectDetail() {
     };
   }, [currentProject]);
 
+  // Preload next and previous project images in background for instant switching
+  useEffect(() => {
+    if (!currentProject) return;
+    const preload = (src) => {
+      if (!src) return;
+      const im = new Image();
+      im.src = src;
+    };
+
+    if (nextProject) {
+      preload(nextProject.coverImage);
+      if (nextProject.gallery) {
+        nextProject.gallery.slice(0, 4).forEach(preload);
+      }
+    }
+    if (prevProject) {
+      preload(prevProject.coverImage);
+    }
+  }, [currentProject, nextProject, prevProject]);
+
   const openLightbox = (img, idx) => {
     setLightboxImg(img);
     setLightboxIndex(idx);
@@ -95,7 +115,7 @@ export default function ProjectDetail() {
       <Navbar />
 
       {/* Main Project Content */}
-      <main style={{ paddingTop: '7rem', paddingBottom: '6rem' }}>
+      <main key={currentProject.slug} style={{ paddingTop: '7rem', paddingBottom: '6rem' }}>
         <div className="container-main">
           {/* Back to Selected Works link */}
           <div style={{ marginBottom: '2.5rem' }}>
@@ -259,6 +279,7 @@ export default function ProjectDetail() {
             }}
           >
             <img
+              key={`cover-${currentProject.slug}`}
               src={currentProject.coverImage}
               alt={`${currentProject.name} — Cover Feature`}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-[1.02]"
@@ -268,6 +289,9 @@ export default function ProjectDetail() {
                 WebkitUserSelect: 'none',
                 pointerEvents: 'none',
               }}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
             />
@@ -310,11 +334,12 @@ export default function ProjectDetail() {
 
           {/* Masonry / Multi-column Gallery */}
           <div
+            key={`gallery-${currentProject.slug}`}
             className="columns-1 md:columns-2 lg:columns-3 gap-6 md:gap-8 mb-20 md:mb-28 [column-fill:balance]"
           >
             {currentProject.gallery?.map((img, idx) => (
               <div
-                key={idx}
+                key={`${currentProject.slug}-${idx}`}
                 className="group break-inside-avoid mb-6 md:mb-8"
                 style={{ overflow: 'hidden' }}
               >
@@ -343,6 +368,7 @@ export default function ProjectDetail() {
                       WebkitUserSelect: 'none',
                     }}
                     loading="lazy"
+                    decoding="async"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />

@@ -70,7 +70,6 @@ export default function Portfolio() {
               fontSize: 'var(--text-heading)',
               fontWeight: 500,
               lineHeight: 1.15,
-              textTransform: 'uppercase',
               letterSpacing: '0.04em',
               color: 'var(--charcoal)',
               marginBottom: '0.75rem',
@@ -87,23 +86,9 @@ export default function Portfolio() {
               fontWeight: 400,
               color: 'var(--charcoal)',
               opacity: 0.85,
-              marginBottom: '0.4rem',
             }}
           >
             Spaces Shaped With Purpose
-          </p>
-
-          <p
-            className="portfolio-header-reveal"
-            style={{
-              fontFamily: 'Playfair Display, serif',
-              fontStyle: 'italic',
-              fontSize: 'var(--text-body)',
-              color: 'var(--charcoal)',
-              opacity: 0.65,
-            }}
-          >
-            A collection of spaces shaped around place, people and purpose.
           </p>
         </div>
 
