@@ -156,6 +156,67 @@ export default function ProjectDetail() {
               >
                 {currentProject.name}
               </h1>
+
+              {/* Project Type & Location */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem',
+                  marginTop: '0.5rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                {currentProject.type && (
+                  <div
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '0.85rem',
+                      color: 'var(--charcoal)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: 'var(--terracotta)',
+                        marginRight: '0.5rem',
+                      }}
+                    >
+                      Project Type:
+                    </span>
+                    <span style={{ opacity: 0.85, fontWeight: 400 }}>{currentProject.type}</span>
+                  </div>
+                )}
+                {currentProject.location && (
+                  <div
+                    style={{
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '0.85rem',
+                      color: 'var(--charcoal)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: 'var(--terracotta)',
+                        marginRight: '0.5rem',
+                      }}
+                    >
+                      Location:
+                    </span>
+                    <span style={{ opacity: 0.85, fontWeight: 400 }}>{currentProject.location}</span>
+                  </div>
+                )}
+              </div>
+
               {currentProject.subtitle && (
                 <p
                   style={{
