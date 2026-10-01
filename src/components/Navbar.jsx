@@ -94,8 +94,11 @@ export default function Navbar() {
               aria-label="Studio Eshanya Home"
             >
               <img
-                src="/logo-white.png"
+                src="/logo-white.webp"
                 alt="Studio Eshanya"
+                width="180"
+                height="48"
+                fetchPriority="high"
                 className="h-12 sm:h-12 md:h-12 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
                 style={{
                   maxHeight: '54px',
@@ -128,6 +131,7 @@ export default function Navbar() {
                 href="https://instagram.com/studioeshanya"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Studio Eshanya on Instagram"
                 style={{ pointerEvents: 'auto', color: 'rgba(255,255,255,0.75)', transition: 'color 0.3s' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)'}
@@ -142,6 +146,7 @@ export default function Navbar() {
                 href="https://facebook.com/studioeshanya"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Studio Eshanya on Facebook"
                 style={{ pointerEvents: 'auto', color: 'rgba(255,255,255,0.75)', transition: 'color 0.3s' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)'}
@@ -154,6 +159,7 @@ export default function Navbar() {
                 href="https://www.linkedin.com/company/studio-eshanya/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Studio Eshanya on LinkedIn"
                 style={{ pointerEvents: 'auto', color: 'rgba(255,255,255,0.75)', transition: 'color 0.3s' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'white'}
                 onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)'}

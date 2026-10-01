@@ -118,6 +118,8 @@ export default function Portfolio() {
                 <img
                   src={project.coverImage}
                   alt={project.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover lightbox-trigger"
                   style={{
                     display: 'block',

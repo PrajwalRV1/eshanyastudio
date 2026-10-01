@@ -238,7 +238,7 @@ export default function Contact() {
               <p style={{ fontFamily: 'Playfair Display, serif', fontSize: 'var(--text-subheading)', fontWeight: 500, marginBottom: '0.2rem', color: 'var(--charcoal)' }}>
                 HSR Layout, Bengaluru
               </p>
-              <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.6, marginBottom: '0.85rem' }}>By Appointment Only</p>
+              <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.85, marginBottom: '0.85rem' }}>By Appointment Only</p>
               <a
                 href="https://maps.google.com/?q=Studio+Eshanya+HSR+Layout+Bengaluru"
                 target="_blank"
@@ -310,8 +310,10 @@ export default function Contact() {
           {/* CENTER — Image + Map */}
           <div className="contact-reveal hidden lg:block">
             <img
-              src="/images/contact/contact.png"
+              src="/images/contact/contact.webp"
               alt="Studio Eshanya Office"
+              loading="lazy"
+              decoding="async"
               className="w-full object-cover mb-4"
               style={{
                 height: '260px',

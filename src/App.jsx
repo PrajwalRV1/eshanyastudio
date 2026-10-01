@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
@@ -14,7 +14,8 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import LeadGenPopup from './components/LeadGenPopup';
-import ProjectDetail from './components/ProjectDetail';
+
+const ProjectDetail = lazy(() => import('./components/ProjectDetail'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -137,7 +138,14 @@ export default function App() {
       <ScrollManager />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/projects/:slug" element={<ProjectDetail />} />
+        <Route
+          path="/projects/:slug"
+          element={
+            <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--parchment)' }} />}>
+              <ProjectDetail />
+            </Suspense>
+          }
+        />
         {/* Fallback to Home */}
         <Route path="*" element={<HomePage />} />
       </Routes>

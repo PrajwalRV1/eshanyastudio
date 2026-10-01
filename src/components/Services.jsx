@@ -92,6 +92,8 @@ export default function Services() {
                   <img
                     src={svc.image}
                     alt={svc.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full object-cover"
                     style={{
                       height: 'clamp(180px, 30vw, 260px)',

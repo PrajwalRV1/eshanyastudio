@@ -64,6 +64,9 @@ export default function Hero() {
           <img
             src={slide.image}
             alt={slide.alt}
+            fetchPriority={i === 0 ? 'high' : 'auto'}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding={i === 0 ? 'sync' : 'async'}
             className="w-full h-full object-cover"
             style={{
               pointerEvents: 'none',

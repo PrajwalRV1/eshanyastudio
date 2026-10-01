@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import sitoutImg from '../assets/assets/04 Portfolio - Images/Project 7/studio-eshanya-banangala-residential-architecture-dharmasthala-sitout.png';
+const sitoutImg = '/images/portfolio/project-7/studio-eshanya-banangala-residential-architecture-dharmasthala-sitout.webp';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,6 +30,8 @@ export default function BengaluruSection() {
             <img
               src={sitoutImg}
               alt="Studio Eshanya — Architecture & Living"
+              loading="lazy"
+              decoding="async"
               className="w-full object-cover"
               style={{
                 height: 'clamp(380px, 50vw, 580px)',

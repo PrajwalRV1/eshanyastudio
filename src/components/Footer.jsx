@@ -41,8 +41,10 @@ export default function Footer() {
                 aria-label="Studio Eshanya Home"
               >
                 <img
-                  src="/logo-white.png"
+                  src="/logo-white.webp"
                   alt="Studio Eshanya"
+                  width="150"
+                  height="40"
                   className="h-9 sm:h-10 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
                   style={{
                     maxHeight: '44px',
@@ -130,7 +132,7 @@ export default function Footer() {
               fontWeight: 500,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.4)',
+              color: 'rgba(255,255,255,0.7)',
               marginBottom: '1.25rem',
             }}>
               Navigation
@@ -170,7 +172,7 @@ export default function Footer() {
               fontWeight: 500,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.4)',
+              color: 'rgba(255,255,255,0.7)',
               marginBottom: '1.25rem',
             }}>
               Contact
@@ -239,7 +241,7 @@ export default function Footer() {
                 fontWeight: 500,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.45)',
+                color: 'rgba(255,255,255,0.7)',
                 marginBottom: '0.4rem',
               }}>
                 What Our Clients Say
@@ -284,7 +286,7 @@ export default function Footer() {
           <p style={{
             fontFamily: 'Inter, sans-serif',
             fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.35)',
+            color: 'rgba(255,255,255,0.7)',
             letterSpacing: '0.04em',
           }}>
             &copy; 2026 Studio Eshanya. All rights reserved.
@@ -292,7 +294,7 @@ export default function Footer() {
           <p style={{
             fontFamily: 'Inter, sans-serif',
             fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.25)',
+            color: 'rgba(255,255,255,0.7)',
           }}>
             Bengaluru
           </p>

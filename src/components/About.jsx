@@ -125,8 +125,10 @@ export default function About() {
             <div className="about-image-reveal">
               <div style={{ overflow: 'hidden', position: 'relative' }}>
                 <img
-                  src="/images/about/about.jpg"
+                  src="/images/about/about.webp"
                   alt="Studio Eshanya — Interior Design"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full object-cover"
                   style={{
                     height: 'clamp(400px, 55vw, 620px)',
@@ -202,7 +204,7 @@ export default function About() {
                 }}>
                   {p.number}
                 </span>
-                <h4 style={{
+                <h3 style={{
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '0.75rem',
                   fontWeight: 600,
@@ -212,7 +214,7 @@ export default function About() {
                   color: 'var(--charcoal)',
                 }}>
                   {p.title}
-                </h4>
+                </h3>
                 <p style={{ fontSize: 'var(--text-body)', color: 'var(--charcoal)', opacity: 0.75, lineHeight: 1.75 }}>
                   {p.description}
                 </p>
